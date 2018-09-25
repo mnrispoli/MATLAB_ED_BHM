@@ -29,11 +29,13 @@ NT=151; % time steps
 
 % periodic boundary conditions
 isPB = 0; % 0 = open boundary; 1 = periodic boundary
-
+jn = 1; % order of neighbor tunnelings
 %%
 
+% folder for storing all matrix files
+folderName = 'Hamiltonians/'
 % hamiltonian and basis parameters
-edFileName=sprintf('%is_%ip_loadme.mat',NSites,NPart) %format for Hamiltonian filename
+edFileName=[folderName sprintf('%i_sites_%i_bosons_%i_pb_%i_jn_loadme.mat',NSites,NPart,isPB,jn)] %format for Hamiltonian filename
 
 % find hilbert space dimension
 HilbD=HilbDim(NSites,NPart)
@@ -44,14 +46,10 @@ if exist(edFileName,'file')==2
     load(edFileName);
 else
     % if it doesn't exist then make them all
-    
-    %basis=BasisMake(HilbD,NSites,NPart);
-    
-    %jterms=FindTunnelingTerms(NSites,isPB);
-    
-    [Hi,Hj,basis]=MakeHamiltonians(HilbD,NSites,NPart,basis);
+    [Hi,Hj,basis] = MakeHamiltoniansAndBasis(NSites,NPart,jn,isPB);
+    save(edFileName,'Hi','Hj','basis','NPart','NSites','jn','isPB')
 end
-
+%%
 % make giant dataStruct to save wavefunction for all disorders
 psiAllW=cell(NW,ND);
 
