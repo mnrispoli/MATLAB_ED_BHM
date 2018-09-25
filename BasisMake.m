@@ -1,4 +1,7 @@
-function [basis] = BasisMake(HilbD,NSites,NPart)
+function [basis] = BasisMake(NSites,NPart)
+
+%find hilbert space size
+HilbD=HilbDim(NSites,NPart);
 
 % creates a basis set that is written as a vector that is the hilbert space
 % dimension x number of sites (way of writing down the many-body fock
