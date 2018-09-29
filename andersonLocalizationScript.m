@@ -29,15 +29,15 @@ Us=ones(size(Ws)).*Uo; %make them all the same
 
 % system size parameters
 NPart=1 % number of bosons
-NSites=11 % number of sites
+NSites=101 % number of sites
 
 % num of disorders and time scans
 ND=199; %disorder number
-NT=5; % time steps
+NT=3; % time steps
 Ts=linspace(0,420,NT) %actual times for ED evaluation 
 
 % periodic boundary conditions
-isPB = 0; % 0 = open boundary; 1 = periodic boundary
+isPB = 1; % 0 = open boundary; 1 = periodic boundary
 jn = 1; % order of neighbor tunnelings
 
 %%
