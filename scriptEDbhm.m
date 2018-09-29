@@ -13,6 +13,8 @@ J=38.1911/1000; %8Er tunneling rate; defined in Hz/(2 pi)
 % disorder strengths
 NW=15;
 Ws=linspace(0.3,22,NW).*J % units of J
+% tupe of disorder
+isQP=1; % 0 = uniform random, 1 = FFT of disorder from exp, 2 = actual QP
 
 % interaction strengths
 Uo=2.7*J % units of J
@@ -26,10 +28,12 @@ NSites=8 % number of sites
 % num of disorders and time scans
 ND=199; %disorder number
 NT=151; % time steps
+Ts=linspace(0,420,NT) %actual times for ED evaluation 
 
 % periodic boundary conditions
 isPB = 0; % 0 = open boundary; 1 = periodic boundary
 jn = 1; % order of neighbor tunnelings
+
 %%
 
 % folder for storing all matrix files
@@ -49,10 +53,14 @@ else
     [Hi,Hj,basis] = MakeHamiltoniansAndBasis(NSites,NPart,jn,isPB);
     save(edFileName,'Hi','Hj','basis','NPart','NSites','jn','isPB')
 end
+
 %%
 % make giant dataStruct to save wavefunction for all disorders
 psiAllW=cell(NW,ND);
 
+% find initial state in basis
+psiInit=zeros(1,HilbD); 
+psiInit(find(ismember(basis,ones(1,NSites),'rows')==1))=1;
 %%
 for ww=1:length(Ws)
     
@@ -60,22 +68,19 @@ for ww=1:length(Ws)
 ww
 %bose hubbard parameters
 
-J=37.5/1000;
-
-
 W=Ws(ww)*J;
 %W=2*J;
 U=Us(ww)*J;
 
-
-isQP=1;
-
+[psiAll, PhiN, En] = ExactDiagTimeFx(psiInit,Ts,Ham)
 
 
 
-tic
+
+
+
 [tt,psiAll,Deig]=mbl_8site_function_red(J,U,W,DisordN,NT,isQP);
-toc
+
 TT{ww}=tt;
 DeigS{ww}=Deig;
 
