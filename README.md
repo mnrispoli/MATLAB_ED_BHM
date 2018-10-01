@@ -2,6 +2,26 @@
 
 This project compiles some functions written in MATLAB and are used for exact diagonalization simulation of 1D, bose-hubbard systems to compare with exeperiments of bosonic atoms in optical lattices in quantum gas microscopes. Note that this then implies all simulations performed by the basic functions in this code are inherently for closed systems since they will have only unitary dynamics.
 
+
+
+## Example Script for single-particle physics
+
+### andersonLocalizationScript.m
+
+Uses exact diagonalization functions to compare single-particle localization in the bose-hubbard model for varius disorders strength and types.
+
+## Example Script for many-body physics
+
+### manybodyLocalizationScript.m
+
+Uses exact diagonalization functions to compare many-body localization in the bose-hubbard model for varius disorders strengths, types, and interactions. 
+
+[ ] Add larger system size comparisons
+
+[ ] Add many-body to anderson localization comparisons
+
+
+
 ## Contained Functions/Uses
 
 [ ] Add n-point correlation functions to be called
@@ -39,22 +59,6 @@ Constructs the disorder hamiltonian given different desired disorder distributio
 ### MakeHamiltoniansAndBasis.m
 
 If it doesn't already exist, this computes the interaction and tunneling hamiltonian matrices for a given bose-hubbard 1-D system given number of lattice sites, number of particles, boundary conditions, and tunneling (nearest neighbor, next-nearest neighbor, etc.).
-
-
-## Example Script for single-particle physics
-
-### andersonLocalizationScript.m
-
-Uses exact diagonalization functions to compare single-particle localization in the bose-hubbard model for varius disorders strength and types.
-
-## manybodyLocalizationScript.m
-
-Uses exact diagonalization functions to compare many-body localization in the bose-hubbard model for varius disorders strengths, types, and interactions. 
-
-[ ] Add larger system size comparisons
-
-[ ] Add many-body to anderson localization comparisons
-
 
 ## Hamiltonians
 
