@@ -10,6 +10,8 @@ This project compiles some functions written in MATLAB and are used for exact di
 
 Uses exact diagonalization functions to compare single-particle localization in the bose-hubbard model for varius disorders strength and types.
 
+![IPR of andrson localiation](https://github.com/mnrispoli/MATLAB_ED_BHM/blob/master/imgs_for_readme/AL_IPR.PNG)
+
 ## Example Script for many-body physics
 
 ### manybodyLocalizationScript.m
