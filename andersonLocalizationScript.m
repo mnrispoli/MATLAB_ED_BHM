@@ -14,11 +14,11 @@ addpath('functions');
 J=38.1911/1000; %8Er tunneling rate; defined in Hz/(2 pi)
 
 % disorder strengths
-NW=15;
+NW=100;
 Ws=linspace(0,4,NW).*J % units of J
 % tupe of disorder
 isQP=1; % 0 = uniform random, 1 = FFT of disorder from exp, 2 = actual QP
-NB=1000;
+NB=500;
 BetaS=linspace(1,2,NB);
 
 
@@ -29,10 +29,10 @@ Us=ones(size(Ws)).*Uo; %make them all the same
 
 % system size parameters
 NPart=1 % number of bosons
-NSites=101 % number of sites
+NSites=51 % number of sites
 
 % num of disorders and time scans
-ND=199; %disorder number
+ND=99; %disorder number
 NT=3; % time steps
 Ts=linspace(0,420,NT) %actual times for ED evaluation 
 
@@ -117,13 +117,14 @@ end
 %%
 figure(1)
 
-imagesc(reshape(mean(IPRSave,2),[NW NB]))
+imagesc(BetaS,Ws,reshape(mean(IPRSave,2),[NW NB]))
 
 set(gcf,'color','white')
 xlabel('\beta (sites)')
 ylabel('Disorder W(J)')
 colormap('jet')
 title('IPR: Single-Particle, Anderson Localization Example')
+colorbar()
 %%
 %{
 load('8site_loadme.mat');
