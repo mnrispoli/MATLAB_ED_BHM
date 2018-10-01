@@ -117,7 +117,7 @@ end
 %%
 figure(1)
 
-imagesc(BetaS,Ws,reshape(mean(IPRSave,2),[NW NB]))
+imagesc(BetaS,Ws./J,reshape(mean(IPRSave,2),[NW NB]))
 
 set(gcf,'color','white')
 xlabel('\beta (sites)')
