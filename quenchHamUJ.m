@@ -13,7 +13,7 @@ clc
 J=38.1911/1000; %8Er tunneling rate; defined in Hz/(2 pi)
 
 % disorder strengths
-NW=15;
+NW=3;
 Ws=linspace(0.3,22,NW).*0.*J % units of J
 % tupe of disorder
 isQP=1; % 0 = uniform random, 1 = FFT of disorder from exp, 2 = actual QP
@@ -21,14 +21,15 @@ isQP=1; % 0 = uniform random, 1 = FFT of disorder from exp, 2 = actual QP
 % interaction strengths
 Uo=2.7*J % units of J
 Us=ones(size(Ws)).*Uo; %make them all the same
-Us=linspace(0,30,NW).*J;
+Us=linspace(0,10,NW).*J;
 
 % system size parameters
-NPart=8 % number of bosons
-NSites=8 % number of sites
+NPart=6 % number of bosons
+NSites=6 % number of sites
 
 % num of disorders and time scans
 ND=1; %disorder number
+DisordN=ND
 NT=25; % time steps
 Ts=linspace(0,10,NT).*(1./(2.*pi.*J)) %actual times for ED evaluation 
 
@@ -74,26 +75,49 @@ W=Ws(ww)*J;
 %W=2*J;
 U=Us(ww)*J;
 Ham = Hj.*J+Hi.*U;
-[psiAll, PhiN, En] = ExactDiagTimeFx(psiInit,Ts,Ham);
+[psiAll, PhiN, En, Cn] = ExactDiagTimeFx(psiInit,Ts,Ham);
 
-ph
+PhiNSave{ww}=PhiN;
+EnSave{ww}=En;
+CnSave{ww}=Cn;
+
+pdf=
+[dataSmpl] = MonteCarloSmp(pdf,tind,NSamp)
 
 
 
 
-[tt,psiAll,Deig]=mbl_8site_function_red(J,U,W,DisordN,NT,isQP);
-
+%[tt,psiAll,Deig]=mbl_8site_function_red(J,U,W,DisordN,NT,isQP);
+%{
 TT{ww}=tt;
 DeigS{ww}=Deig;
 
 for dd=1:DisordN
     psiAllW{ww,dd}=psiAll{dd};
 end
+%}
 
 end
 %%
-load('8site_loadme.mat');
+
+for ww=1:NW
+    tempE(ww,:)=EnSave{ww}./J;
+    gapsW(ww,:)=tempE(ww,2:end)-tempE(ww,1:end-1);
+    tempC(ww,:)=CnSave{ww};
+    pn=tempC(ww,:).^2;
+    pns(ww,:)=(pn(2:end).*pn(1:end-1)).*4;
+    HL=round(HilbD/3);
+    HH=round(HilbD.*2./3);
+    tempGap=[gapsW(ww,HL:HH+1); gapsW(ww,HL-1:HH)];
+    rspec(ww)=mean(min(tempGap,[],1)./max(tempGap,[],1),2);
+    
+    [ii,jj]=sort(pn,'descend');
+    
+end
 %%
+%load('8site_loadme.mat');
+%%
+%{
 nhalf=sum(basis(:,1:size(basis,2)/2),2);
 ND=DisordN;
 
@@ -121,16 +145,17 @@ for ww=1:length(Ws)
     SPM=mean(Sp,3);
     nbarM=reshape(mean(nbar,3),[NS,NT,length(Ws)]);
 end
+%}
 
 %%
-tj=TT{1}.*J.*2.*pi;
+%tj=TT{1}.*J.*2.*pi;
 
 %cab_corr_red;
 
 %subSystemsEP_small_half_only;
 
 %% Correlation length section
-
+%{
 
 % Okay so this is looking at the old data
 
@@ -295,3 +320,4 @@ tjLow=tj;
 WsLow=Ws;
 xd100jtLow=xd(67,:);
 save('LowWXDat.mat','WsLow','tjLow','xdLow','xd100jtLow')
+%}

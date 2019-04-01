@@ -13,25 +13,28 @@ clc
 J=38.1911/1000; %8Er tunneling rate; defined in Hz/(2 pi)
 
 % disorder strengths
-NW=15;
+NW=1;
 Ws=linspace(0.3,22,NW).*0.*J % units of J
+Ws=[18]
 % tupe of disorder
 isQP=1; % 0 = uniform random, 1 = FFT of disorder from exp, 2 = actual QP
 
 % interaction strengths
 Uo=2.7*J % units of J
 Us=ones(size(Ws)).*Uo; %make them all the same
-Us=linspace(0,30,NW).*J;
+Us=linspace(0,10,NW).*J;
 
 % system size parameters
 NPart=8 % number of bosons
 NSites=8 % number of sites
 
 % num of disorders and time scans
-ND=1; %disorder number
-NT=25; % time steps
-Ts=linspace(0,10,NT).*(1./(2.*pi.*J)) %actual times for ED evaluation 
-
+ND=7; %disorder number
+DisordN=ND
+NT=51; % time steps
+tau=(1./(2.*pi.*J));
+Ts=linspace(0,1000,NT) %actual times for ED evaluation 
+Ts=logspace(-1,4,NT).*tau;
 % periodic boundary conditions
 isPB = 0; % 0 = open boundary; 1 = periodic boundary
 jn = 1; % order of neighbor tunnelings
@@ -64,36 +67,111 @@ psiAllW=cell(NW,ND);
 psiInit=zeros(1,HilbD); 
 psiInit(find(ismember(basis,ones(1,NSites),'rows')==1))=1;
 %%
+gnPDFStoreStd=zeros(NT,ND,NSites,NW);
+gnPDFStoreMAbs=zeros(NT,ND,NSites,NW);
 for ww=1:length(Ws)
-    
-    
-ww
+    ww
+for dd=1:ND
+    dd
+
 %bose hubbard parameters
+
+%Disorder Hamiltonian
+isQP=2;
+beta=1.618;
+Hd=MakeDisorderHam(basis,isQP,2*pi*dd/ND,beta);
 
 W=Ws(ww)*J;
 %W=2*J;
-U=Us(ww)*J;
-Ham = Hj.*J+Hi.*U;
-[psiAll, PhiN, En] = ExactDiagTimeFx(psiInit,Ts,Ham);
+U=Us(1).*J;
+Ham = Hj.*J+Hi.*U+Hd.*W;
 
-ph
+[psiAll, PhiN, En, Cn] = ExactDiagTimeFx(psiInit,Ts,Ham);
+
+%{
+PhiNSave{ww}=PhiN;
+EnSave{ww}=En;
+CnSave{ww}=Cn;
+%}
+
+
+pdf = abs(psiAll(:,:)).^2; 
+%NSamp=1E6
+%[dataSmpl] = MonteCarloSmp(pdf,tind,NSamp);
+
+nord=6
+inds=1:6
+%[sn2k,S2kInds,indsNKStore,corrn,gn] = dynBldGnFxFsPPMap(basis(dataSmpl,:),nord,inds,1)
+for tind=1:NT
+    pn=pdf(:,tind);
+    %gnDat=gn;
+    [sn2k,S2kInds,indsNKStore,corrn,gn] = dynBldGnFxFsPPMapPDF(pn,basis,nord,inds,0);
+    
+    for nn=1:length(gn)
+        gnPDFStoreStd(tind,dd,nn,ww)=std(((cell2mat(values(gn{nn})))));
+        gnPDFStoreMAbs(tind,dd,nn,ww)=mean(abs((cell2mat(values(gn{nn})))));
+    end
+end
 
 
 
-
-[tt,psiAll,Deig]=mbl_8site_function_red(J,U,W,DisordN,NT,isQP);
-
+%[tt,psiAll,Deig]=mbl_8site_function_red(J,U,W,DisordN,NT,isQP);
+%{
 TT{ww}=tt;
 DeigS{ww}=Deig;
 
 for dd=1:DisordN
     psiAllW{ww,dd}=psiAll{dd};
 end
+%}
 
 end
+end
+
 %%
-load('8site_loadme.mat');
+
+figure(11)
+for ww=1:length(Ws)
+for nn=1:NSites
+    subplot(2,3,nn)
+    semilogx(Ts./tau,mean(gnPDFStore(:,:,nn,ww),2))
+    hold on
+end
+end
+
 %%
+
+figure(22)
+for ww=1
+for nn=1:NSites
+    subplot(2,3,nn)
+    semilogx(Ts./tau,mean(gnPDFStore(:,:,nn,ww),2))
+    hold on
+end
+end
+
+%%
+%{
+
+for ww=1:NW
+    tempE(ww,:)=EnSave{ww}./J;
+    gapsW(ww,:)=tempE(ww,2:end)-tempE(ww,1:end-1);
+    tempC(ww,:)=CnSave{ww};
+    pn=tempC(ww,:).^2;
+    pns(ww,:)=(pn(2:end).*pn(1:end-1)).*4;
+    HL=round(HilbD/3);
+    HH=round(HilbD.*2./3);
+    tempGap=[gapsW(ww,HL:HH+1); gapsW(ww,HL-1:HH)];
+    rspec(ww)=mean(min(tempGap,[],1)./max(tempGap,[],1),2);
+    
+    [ii,jj]=sort(pn,'descend');
+    
+end
+%}
+%%
+%load('8site_loadme.mat');
+%%
+%{
 nhalf=sum(basis(:,1:size(basis,2)/2),2);
 ND=DisordN;
 
@@ -121,16 +199,17 @@ for ww=1:length(Ws)
     SPM=mean(Sp,3);
     nbarM=reshape(mean(nbar,3),[NS,NT,length(Ws)]);
 end
+%}
 
 %%
-tj=TT{1}.*J.*2.*pi;
+%tj=TT{1}.*J.*2.*pi;
 
 %cab_corr_red;
 
 %subSystemsEP_small_half_only;
 
 %% Correlation length section
-
+%{
 
 % Okay so this is looking at the old data
 
@@ -295,3 +374,4 @@ tjLow=tj;
 WsLow=Ws;
 xd100jtLow=xd(67,:);
 save('LowWXDat.mat','WsLow','tjLow','xdLow','xd100jtLow')
+%}

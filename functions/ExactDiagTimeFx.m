@@ -1,4 +1,4 @@
-function [psiAll, PhiN, En] = ExactDiagTimeFx(psiInit,Ts,Ham)
+function [psiAll, PhiN, En, Cn] = ExactDiagTimeFx(psiInit,Ts,Ham)
 
 %this function just takes the Hamiltonian "Ham" and calculates the dynamics
 %of the initial state PsiInit
